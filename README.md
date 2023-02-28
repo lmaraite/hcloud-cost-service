@@ -1,4 +1,4 @@
-# hcloud-cost-estimator
+# hcloud-cost-service
 
 Hetzner Cloud does not offer any tool to estimate your monthly costs.
 This microservice should solve one part of the problem. It should provide
