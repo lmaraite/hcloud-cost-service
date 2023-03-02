@@ -21,13 +21,17 @@ func main() {
 	costs := route.Group("/costs")
 	costs.GET("/server", servercosts.ServerCosts)
 
+	route.Run(getFormattedPort())
+}
+
+func getFormattedPort() string {
 	var port int
 	if viper.InConfig(configPort) {
 		port = viper.GetInt(configPort)
 	} else {
 		port = defaultPort
 	}
-	route.Run(fmt.Sprintf(":%d", port))
+	return fmt.Sprintf(":%d", port)
 }
 
 func readConfig() {
