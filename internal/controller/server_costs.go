@@ -1,19 +1,30 @@
-package servercosts
+package controller
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/hetznercloud/hcloud-go/hcloud"
 )
 
-func serverCosts(apiToken string) (*ServerCostsResponse, error) {
+type hcloudServerClient interface {
+	All(ctx context.Context) ([]*hcloud.Server, error)
+}
+
+type ServerCostsResponse struct {
+	Monthly   float64
+	Hourly    float64
+	ErrorCode int
+}
+
+func CalculateCosts(client hcloudServerClient) (*ServerCostsResponse, error) {
 	response := &ServerCostsResponse{}
-	client := hcloud.NewClient(hcloud.WithToken(apiToken))
-	server, err := client.Server.All(context.TODO())
+	server, err := client.All(context.TODO())
+	fmt.Println("DEBUG:", server)
 	if err != nil {
-		response.errorCode = http.StatusBadRequest
+		response.ErrorCode = http.StatusBadRequest
 		return response, err
 	}
 	for _, instance := range server {

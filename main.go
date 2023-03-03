@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	servercosts "github.com/lmaraite/hcloud-cost-service/internal/server-costs"
+	"github.com/lmaraite/hcloud-cost-service/internal/handler"
 	"github.com/spf13/viper"
 )
 
@@ -19,7 +19,7 @@ func main() {
 	route := gin.Default()
 
 	costs := route.Group("/costs")
-	costs.GET("/server", servercosts.ServerCosts)
+	costs.GET("/server", handler.ServerCosts)
 
 	route.Run(getFormattedPort())
 }

@@ -1,10 +1,12 @@
-package servercosts
+package handler
 
 import (
 	"net/http"
 
 	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
+	"github.com/hetznercloud/hcloud-go/hcloud"
+	"github.com/lmaraite/hcloud-cost-service/internal/controller"
 )
 
 const (
@@ -16,13 +18,14 @@ func ServerCosts(c *gin.Context) {
 
 	apiToken := c.GetHeader(apiTokenHeader)
 
-	response, err := serverCosts(apiToken)
+	client := hcloud.NewClient(hcloud.WithToken(apiToken))
+
+	response, err := controller.CalculateCosts(&client.Server)
 	if err != nil {
-		c.JSON(response.errorCode, gin.H{
+		c.JSON(response.ErrorCode, gin.H{
 			errorMessageKey: err.Error(),
 		})
 		return
 	}
 	c.JSON(http.StatusOK, structs.Map(&response))
 }
-
