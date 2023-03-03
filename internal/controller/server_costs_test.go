@@ -48,6 +48,40 @@ func TestServerCosts(t *testing.T) {
 				Hourly:  0.012,
 			},
 		},
+		{
+			name: "MultipleServer",
+			server: []*hcloud.Server{
+				createServer("test-server-0", "ffm-1", createHcloudPricings([]serverTypeLocationPricing{
+					{
+						locationName: "ffm-1",
+						monthlyPrice: "15.00",
+						hourlyPrice:  "0.012",
+					},
+					{
+						locationName: "ber-1",
+						monthlyPrice: "17.13",
+						hourlyPrice:  "0.015",
+					},
+				})),
+				createServer("test-server-1", "ffm-1", createHcloudPricings([]serverTypeLocationPricing{
+					{
+						locationName: "ffm-1",
+						monthlyPrice: "15.00",
+						hourlyPrice:  "0.010",
+					},
+					{
+						locationName: "ber-1",
+						monthlyPrice: "17.13",
+						hourlyPrice:  "0.015",
+					},
+				})),
+			},
+			err: nil,
+			expected: &controller.ServerCostsResponse{
+				Monthly: 30.00,
+				Hourly:  0.022,
+			},
+		},
 	}
 
 	for _, tc := range testCases {
