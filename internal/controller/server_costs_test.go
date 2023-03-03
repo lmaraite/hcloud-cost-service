@@ -19,36 +19,87 @@ func (mock hcloudServerClientMock) All(ctx context.Context) ([]*hcloud.Server, e
 }
 
 func TestServerCosts(t *testing.T) {
-	mock := hcloudServerClientMock{}
-	instance := &hcloud.Server{
-		Name: "instance-01",
-		Datacenter: &hcloud.Datacenter{
-			Location: &hcloud.Location{
-				Name: "ffm-1",
-			},
-		},
-		ServerType: &hcloud.ServerType{
-			Pricings: []hcloud.ServerTypeLocationPricing{
-				{
-					Location: &hcloud.Location{
-						Name: "ffm-1",
+	testCases := []struct {
+		name     string
+		server   []*hcloud.Server
+		err      error
+		expected *controller.ServerCostsResponse
+	}{
+		{
+			name: "TestSingleServer",
+			server: []*hcloud.Server{
+				createServer("test-server", "ffm-1", createHcloudPricings([]serverTypeLocationPricing{
+					{
+						locationName: "ffm-1",
+						monthlyPrice: "15.13",
+						hourlyPrice:  "0.012",
 					},
-					Monthly: hcloud.Price{
-						Gross: "13.13",
+					{
+						locationName: "ber-1",
+						monthlyPrice: "17.13",
+						hourlyPrice:  "0.015",
 					},
-                    Hourly: hcloud.Price{
-                        Gross: "0.018",
-                    },
 				},
+				)),
+			},
+			err: nil,
+			expected: &controller.ServerCostsResponse{
+				Monthly: 13.13,
+				Hourly:  0.018,
 			},
 		},
 	}
-    mock.server = []*hcloud.Server{instance}
-    mock.err = nil
 
-    response, err := controller.CalculateCosts(mock)
-    assert.NoError(t, err)
-    assert.Equal(t, 13.13, response.Monthly)
-    assert.Equal(t, 0.018, response.Hourly)
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			mock := hcloudServerClientMock{
+				server: tc.server,
+				err:    tc.err,
+			}
+			response, err := controller.CalculateServerCosts(mock)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expected, response)
+		})
+	}
 
+}
+
+type serverTypeLocationPricing struct {
+	locationName string
+	monthlyPrice string
+	hourlyPrice  string
+}
+
+func createHcloudPricings(pricings []serverTypeLocationPricing) []hcloud.ServerTypeLocationPricing {
+	result := make([]hcloud.ServerTypeLocationPricing, 0)
+	for _, pricing := range pricings {
+		result = append(result, hcloud.ServerTypeLocationPricing{
+			Location: &hcloud.Location{
+				Name: pricing.locationName,
+			},
+			Monthly: hcloud.Price{
+				Gross: pricing.monthlyPrice,
+			},
+			Hourly: hcloud.Price{
+				Gross: pricing.hourlyPrice,
+			},
+		})
+	}
+	return nil
+}
+
+func createServer(name string, locationName string, pricings []hcloud.ServerTypeLocationPricing) *hcloud.Server {
+	return &hcloud.Server{
+		Name: name,
+		Datacenter: &hcloud.Datacenter{
+			Location: &hcloud.Location{
+				Name: locationName,
+			},
+		},
+		ServerType: &hcloud.ServerType{
+			Pricings: pricings,
+		},
+	}
 }

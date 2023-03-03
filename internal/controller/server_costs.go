@@ -2,8 +2,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
-	"net/http"
 	"strconv"
 
 	"github.com/hetznercloud/hcloud-go/hcloud"
@@ -14,17 +12,14 @@ type HcloudServerClient interface {
 }
 
 type ServerCostsResponse struct {
-	Monthly   float64
-	Hourly    float64
-	ErrorCode int
+	Monthly float64
+	Hourly  float64
 }
 
-func CalculateCosts(client HcloudServerClient) (*ServerCostsResponse, error) {
+func CalculateServerCosts(client HcloudServerClient) (*ServerCostsResponse, error) {
 	response := &ServerCostsResponse{}
 	server, err := client.All(context.TODO())
-	fmt.Println("DEBUG:", server)
 	if err != nil {
-		response.ErrorCode = http.StatusBadRequest
 		return response, err
 	}
 	for _, instance := range server {
