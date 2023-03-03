@@ -9,7 +9,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/hcloud"
 )
 
-type hcloudServerClient interface {
+type HcloudServerClient interface {
 	All(ctx context.Context) ([]*hcloud.Server, error)
 }
 
@@ -19,7 +19,7 @@ type ServerCostsResponse struct {
 	ErrorCode int
 }
 
-func CalculateCosts(client hcloudServerClient) (*ServerCostsResponse, error) {
+func CalculateCosts(client HcloudServerClient) (*ServerCostsResponse, error) {
 	response := &ServerCostsResponse{}
 	server, err := client.All(context.TODO())
 	fmt.Println("DEBUG:", server)

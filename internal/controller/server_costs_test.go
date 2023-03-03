@@ -7,22 +7,19 @@ import (
 	"github.com/hetznercloud/hcloud-go/hcloud"
 	"github.com/lmaraite/hcloud-cost-service/internal/controller"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
-type mockHcloudServerClient struct {
-	mock.Mock
+type hcloudServerClientMock struct {
+	server []*hcloud.Server
+	err    error
 }
 
-func (m mockHcloudServerClient) All(ctx context.Context) ([]*hcloud.Server, error) {
-	args := m.Called(ctx)
-	return []*hcloud.Server{}, args.Error(1)
+func (mock hcloudServerClientMock) All(ctx context.Context) ([]*hcloud.Server, error) {
+	return mock.server, mock.err
 }
 
 func TestServerCosts(t *testing.T) {
-	mock := &mockHcloudServerClient{}
-
-	server := make([]*hcloud.Server, 0)
+	mock := hcloudServerClientMock{}
 	instance := &hcloud.Server{
 		Name: "instance-01",
 		Datacenter: &hcloud.Datacenter{
@@ -39,16 +36,19 @@ func TestServerCosts(t *testing.T) {
 					Monthly: hcloud.Price{
 						Gross: "13.13",
 					},
+                    Hourly: hcloud.Price{
+                        Gross: "0.018",
+                    },
 				},
 			},
 		},
 	}
-	server = append(server, instance)
+    mock.server = []*hcloud.Server{instance}
+    mock.err = nil
 
-	mock.On("All", context.TODO()).Return(server, nil)
-	response, err := controller.CalculateCosts(mock)
-	if err != nil {
-		t.Fail()
-	}
-	assert.Equal(t, 13.13, response.Monthly)
+    response, err := controller.CalculateCosts(mock)
+    assert.NoError(t, err)
+    assert.Equal(t, 13.13, response.Monthly)
+    assert.Equal(t, 0.018, response.Hourly)
+
 }
