@@ -44,8 +44,8 @@ func TestServerCosts(t *testing.T) {
 			},
 			err: nil,
 			expected: &controller.ServerCostsResponse{
-				Monthly: 13.13,
-				Hourly:  0.018,
+				Monthly: 15.13,
+				Hourly:  0.012,
 			},
 		},
 	}
@@ -87,7 +87,7 @@ func createHcloudPricings(pricings []serverTypeLocationPricing) []hcloud.ServerT
 			},
 		})
 	}
-	return nil
+	return result
 }
 
 func createServer(name string, locationName string, pricings []hcloud.ServerTypeLocationPricing) *hcloud.Server {
