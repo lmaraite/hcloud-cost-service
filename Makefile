@@ -5,8 +5,8 @@ run:
 	go run .
 
 test:
-	go test ./... -cover
+	go test -v -coverpkg=./... ./...
 
 coverage:
-	go test ./... -coverprofile=coverage.out
+	go test -v -coverpkg=./... -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out
