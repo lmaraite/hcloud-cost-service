@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lmaraite/hcloud-cost-service/internal/handler"
+	"github.com/lmaraite/hcloud-cost-service/handler"
 	"github.com/spf13/viper"
 )
 

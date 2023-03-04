@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/hetznercloud/hcloud-go/hcloud"
-	"github.com/lmaraite/hcloud-cost-service/internal/controller"
+	"github.com/lmaraite/hcloud-cost-service/controller"
 	"github.com/stretchr/testify/assert"
 )
 
