@@ -14,16 +14,31 @@ const (
 	errorMessageKey = "error_message"
 )
 
-func ServerCosts(c *gin.Context) {
+type ServerCostsController interface {
+    CalculateServerCosts() (*controller.ServerCostsResponse, error)
+}
 
-	apiToken := c.GetHeader(apiTokenHeader)
+type ServerCostsHandler struct {
+    Controller ServerCostsController
+}
 
-	client := &hcloud.NewClient(hcloud.WithToken(apiToken)).Server
+func NewServerCostsHandler(controller ServerCostsController) *ServerCostsHandler {
+    return &ServerCostsHandler{
+        Controller: controller,    
+    }
+}
 
+func DefaultServerCostsHandler(c *gin.Context) *ServerCostsHandler {
+    apiToken := c.GetHeader(apiTokenHeader)
+    client := &hcloud.NewClient(hcloud.WithToken(apiToken)).Server
     controller := controller.NewServerCostsController(client)
+    return &ServerCostsHandler{
+        Controller: controller,
+    }
+}
 
-	response, err := controller.CalculateServerCosts()
-
+func (handler *ServerCostsHandler) ServerCosts(c *gin.Context) {
+	response, err := handler.Controller.CalculateServerCosts()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			errorMessageKey: err.Error(),

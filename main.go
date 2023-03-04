@@ -19,7 +19,10 @@ func main() {
 	route := gin.Default()
 
 	costs := route.Group("/costs")
-	costs.GET("/server", handler.ServerCosts)
+	costs.GET("/server", func(c *gin.Context) {
+		handler := handler.DefaultServerCostsHandler(c)
+		handler.ServerCosts(c)
+	})
 
 	route.Run(getFormattedPort())
 }
