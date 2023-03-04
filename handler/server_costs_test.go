@@ -2,6 +2,7 @@ package handler_test
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -36,6 +37,12 @@ func TestServerCostsHandler(t *testing.T) {
 			},
 			err:          nil,
 			expectedCode: 200,
+		},
+		{
+			name:         "TestErrorResponse",
+			response:     &controller.ServerCostsResponse{},
+			err:          errors.New("Test Error"),
+			expectedCode: 400,
 		},
 	}
 	for _, tc := range testCases {
