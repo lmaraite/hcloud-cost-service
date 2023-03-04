@@ -16,9 +16,19 @@ type ServerCostsResponse struct {
 	Hourly  float64
 }
 
-func CalculateServerCosts(client HcloudServerClient) (*ServerCostsResponse, error) {
+type ServerCostsController struct {
+	Client HcloudServerClient
+}
+
+func NewServerCostsController(client HcloudServerClient) *ServerCostsController {
+	return &ServerCostsController{
+		Client: client,
+	}
+}
+
+func (scc *ServerCostsController) CalculateServerCosts() (*ServerCostsResponse, error) {
 	response := &ServerCostsResponse{}
-	server, err := client.All(context.TODO())
+	server, err := scc.Client.All(context.TODO())
 	if err != nil {
 		return response, err
 	}

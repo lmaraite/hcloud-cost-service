@@ -126,7 +126,8 @@ func TestServerCosts(t *testing.T) {
 				server: tc.server,
 				err:    tc.err,
 			}
-			response, err := controller.CalculateServerCosts(mock)
+			serverCostsController := controller.NewServerCostsController(mock)
+			response, err := serverCostsController.CalculateServerCosts()
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expected, response)
 		})

@@ -18,9 +18,12 @@ func ServerCosts(c *gin.Context) {
 
 	apiToken := c.GetHeader(apiTokenHeader)
 
-	client := hcloud.NewClient(hcloud.WithToken(apiToken))
+	client := &hcloud.NewClient(hcloud.WithToken(apiToken)).Server
 
-	response, err := controller.CalculateServerCosts(&client.Server)
+    controller := controller.NewServerCostsController(client)
+
+	response, err := controller.CalculateServerCosts()
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			errorMessageKey: err.Error(),
